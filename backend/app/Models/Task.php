@@ -16,4 +16,25 @@ class Task extends Model
         'priority',
         'status',
     ];
+
+    public function scopeWithPriority($query, $value)
+    {
+        return $query->where('priority', $value);
+    }
+
+    public function scopeWithStatus($query, $value)
+    {
+        return $query->where('status', $value);
+    }
+
+    public function scopeSortByDeadline($query, $bool)
+    {
+        return $query->orderBy('deadline', $bool ? 'asc' : 'desc');
+    }
+
+    public function scopeOverdue($query)
+    {
+        return $query->where('deadline', '<', now());
+    }
+
 }

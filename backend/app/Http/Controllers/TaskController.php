@@ -13,9 +13,23 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $tasks = Task::all();
+        $query = Task::query();
+
+        if($request->status){
+            $query = $query->withStatus($request->status);
+        }
+
+        if ($request->has('sort_deadline')) {
+            $query->sortByDeadline($request->boolean('sort_deadline'));
+        }
+
+        if($request->priority){
+            $query = $query->withPriority($request->priority);
+        }
+
+        $tasks = $query->get();
         return TaskResource::collection($tasks);
     }
 
