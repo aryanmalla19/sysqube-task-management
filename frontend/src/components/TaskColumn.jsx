@@ -1,21 +1,28 @@
-// src/components/TaskColumn.js
 import React from 'react';
+import defaultPP from "../assets/default-pfp.jpg";
+import { FaAngleDoubleUp, FaAngleDoubleDown, FaEquals } from "react-icons/fa";
 
 function TaskColumn({ title, tasks }) {
+  const priorityIcon = {
+    low: <FaAngleDoubleDown className="text-green-500" />,
+    medium: <FaEquals className="text-yellow-500" />,     
+    high: <FaAngleDoubleUp className="text-red-500" />,  
+  };
+
   return (
-    <div className='w-[32%] bg-gray-100 p-4 rounded shadow-md mx-1'>
-      <h2 className='text-xl font-semibold mb-4'>{title}</h2>
+    <div className='w-[32%] bg-[#f4f5f7] py-4 px-2 rounded-md shadow-sm mx-1'>
+      <h2 className='font-semibold text-gray-700 text-sm mb-4 uppercase tracking-wide'>{title}</h2>
       <div className='space-y-3'>
         {tasks.map((task, idx) => (
-          <div key={idx} className={`p-3 rounded border ${task.overdue ? 'border-red-500' : 'border-gray-300'}`}>
-            <p className='font-medium'>{task.title}</p>
-            <div className='text-sm text-gray-600 flex justify-between'>
-              <span>{task.deadline}</span>
-              <span className={`px-2 py-1 rounded text-white text-xs ${{
-                low: 'bg-green-500',
-                medium: 'bg-yellow-500',
-                high: 'bg-red-500'
-              }[task.priority]}`}>{task.priority}</span>
+          <div key={idx}
+            className={`p-4 rounded-md bg-white border text-sm shadow-sm ${task.overdue ? 'border-red-500' : 'border-gray-200'}`}>
+            <p className='text-gray-900 font-medium mb-1'>{task.title}</p>
+            <div className='flex justify-between items-center text-gray-600'>
+              <span className='text-xs'>{new Date(task.deadline).toLocaleString()}</span>
+              <div className='flex items-center gap-1 text-xl'>
+                {priorityIcon[task.priority]}
+                <img className="w-8 h-8 rounded-full border border-gray-500" src={defaultPP} alt="default picture" srcset="" />
+              </div>
             </div>
           </div>
         ))}
