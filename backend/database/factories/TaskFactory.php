@@ -17,11 +17,11 @@ class TaskFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => fake()->title,
+            'title' => fake()->sentence(5),
             'description' => fake()->optional(0.5)->text(),
-            'deadline' => fake()->time(),
+            'deadline' => fake()->date(),
             'priority' => fake()->randomElement(['low', 'medium', 'high']),
-            'status' => fake()->randomElement(['todo', 'in-progress', 'completed']),
+            'status' => fake()->randomElement(['todo', 'in-progress', 'done']),
         ];
     }
 }

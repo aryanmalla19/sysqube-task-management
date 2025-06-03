@@ -9,6 +9,9 @@ class Task extends Model
 {
     /** @use HasFactory<\Database\Factories\TaskFactory> */
     use HasFactory;
+
+    public $timestamps = false;
+
     protected $fillable = [
         'title',
         'description',
@@ -27,9 +30,25 @@ class Task extends Model
         return $query->where('status', $value);
     }
 
-    public function scopeSortByDeadline($query, $bool)
+    public function scopeSort($query, $value)
     {
-        return $query->orderBy('deadline', $bool ? 'asc' : 'desc');
+        if ($value === 'priority') {
+            return $query->orderByRaw("
+            CASE priority
+                WHEN 'high' THEN 1
+                WHEN 'medium' THEN 2
+                WHEN 'low' THEN 3
+                ELSE 4
+            END
+        ");
+        }
+
+        return $query->orderBy($value, 'asc');
+    }
+
+    public function scopeSearch($query, $value)
+    {
+        return $query->where('title', 'like', '%' . $value . '%');
     }
 
     public function scopeOverdue($query)

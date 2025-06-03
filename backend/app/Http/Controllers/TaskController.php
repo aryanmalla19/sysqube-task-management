@@ -21,12 +21,16 @@ class TaskController extends Controller
             $query = $query->withStatus($request->status);
         }
 
-        if ($request->has('sort_deadline')) {
-            $query->sortByDeadline($request->boolean('sort_deadline'));
+        if($request->sort){
+            $query = $query->sort($request->sort);
         }
 
         if($request->priority){
             $query = $query->withPriority($request->priority);
+        }
+
+        if($request->search){
+            $query = $query->search($request->search);
         }
 
         $tasks = $query->get();

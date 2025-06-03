@@ -26,7 +26,7 @@ class StoreTaskRequest extends FormRequest
             'description' => 'nullable|min:1',
             'deadline' => 'required',
             'priority' => 'required|in:low,medium,high',
-            'status' => 'required|in:todo,in-progress,completed',
+            'status' => 'required|in:todo,in-progress,done',
         ];
     }
 }
