@@ -13,7 +13,7 @@ function TaskLayout() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
 
-  const { data, isLoading, isError } = useFetchTasks({
+  const { data } = useFetchTasks({
     priority: priorityFilter,
     status: statusFilter,
     search: searchTerm,
