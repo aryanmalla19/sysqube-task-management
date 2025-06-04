@@ -1,17 +1,45 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import TaskColumn from './TaskColumn';
 import { FaBolt } from 'react-icons/fa';
 import { IoSearch } from 'react-icons/io5';
 import Modal from './Modal';
 import useFetchTasks from '../hooks/useFetchTasks';
+import { DndContext } from '@dnd-kit/core';
+import useUpdateTask from '../hooks/useUpdateTask';
+import toast from 'react-hot-toast';
 
 function TaskLayout() {
+  const { mutate } = useUpdateTask();
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('deadline');
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const wasDragged = useRef(false);
+
+
+  function handleDragEnd(event) {
+  const { active, over } = event;
+  if (!over) return;
+
+  const taskId = active.id;
+  const newStatus = over.id;
+  mutate({
+    id: taskId,
+    updatedTask: 
+    {
+      status: newStatus
+    }
+  }, {
+    onSuccess: () => {
+      toast.success('Task updated!');
+    },
+    onError: () => {
+      toast.error('Failed to save task.');
+    }
+  })
+}
 
   const { data } = useFetchTasks({
     priority: priorityFilter,
@@ -19,7 +47,7 @@ function TaskLayout() {
     search: searchTerm,
     sortBy,
   });
-
+  
   const tasksByStatus = (status) =>
     data?.data.filter((task) => task.status === status) || [];
 
@@ -100,26 +128,41 @@ function TaskLayout() {
         </div>
       </div>
 
-      <div className="flex gap-4">
-        <TaskColumn
-          title="TO DO"
-          tasks={tasksByStatus('todo')}
-          setIsModalOpen={setIsModalOpen}
-          setSelectedTask={setSelectedTask}
-        />
-        <TaskColumn
-          title="IN PROGRESS"
-          tasks={tasksByStatus('in-progress')}
-          setIsModalOpen={setIsModalOpen}
-          setSelectedTask={setSelectedTask}
-        />
-        <TaskColumn
-          title="DONE"
-          tasks={tasksByStatus('done')}
-          setIsModalOpen={setIsModalOpen}
-          setSelectedTask={setSelectedTask}
-        />
-      </div>
+      <DndContext
+       onDragStart={() => {
+        wasDragged.current = false; 
+      }}
+      onDragMove={() => {
+        wasDragged.current = true; 
+      }}
+      onDragEnd={(event) => {
+        if (!wasDragged.current) return; 
+        handleDragEnd(event); 
+      }}>
+        <div className="flex gap-4">
+          <TaskColumn
+            title="TO DO"
+            status="todo"
+            tasks={tasksByStatus('todo')}
+            setIsModalOpen={setIsModalOpen}
+            setSelectedTask={setSelectedTask}
+          />
+          <TaskColumn
+            title="IN PROGRESS"
+            status="in-progress"
+            tasks={tasksByStatus('in-progress')}
+            setIsModalOpen={setIsModalOpen}
+            setSelectedTask={setSelectedTask}
+          />
+          <TaskColumn
+            title="DONE"
+            status="done"
+            tasks={tasksByStatus('done')}
+            setIsModalOpen={setIsModalOpen}
+            setSelectedTask={setSelectedTask}
+          />
+        </div>
+      </DndContext>
 
       {isModalOpen && (
         <Modal
@@ -133,5 +176,7 @@ function TaskLayout() {
     </div>
   );
 }
+
+
 
 export default TaskLayout;
